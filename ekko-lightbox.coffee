@@ -52,10 +52,10 @@ EkkoLightbox = ( element, options ) ->
 	}
 
 	@modal
-	.on('show.bs.modal', @options.onShow.bind(@))
-	.on 'shown.bs.modal', =>
-		@modal_shown()
-		@options.onShown.call(@)
+	.on 'show.bs.modal', =>
+		@modal_show()
+		@options.onShow.call(@)
+	.on('shown.bs.modal', @options.onShown.bind(@))
 	.on('hide.bs.modal', @options.onHide.bind(@))
 	.on 'hidden.bs.modal', =>
 		if @gallery
@@ -67,7 +67,7 @@ EkkoLightbox = ( element, options ) ->
 	@modal
 
 EkkoLightbox.prototype = {
-	modal_shown: ->
+	modal_show: ->
 		# when the modal first loads
 		if !@options.remote
 			@error 'No remote target given'

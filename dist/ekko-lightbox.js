@@ -47,12 +47,12 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       bottom: parseFloat(this.modal_dialog.css('padding-bottom')) + parseFloat(this.modal_content.css('padding-bottom')) + parseFloat(this.modal_body.css('padding-bottom')),
       left: parseFloat(this.modal_dialog.css('padding-left')) + parseFloat(this.modal_content.css('padding-left')) + parseFloat(this.modal_body.css('padding-left'))
     };
-    this.modal.on('show.bs.modal', this.options.onShow.bind(this)).on('shown.bs.modal', (function(_this) {
+    this.modal.on('show.bs.modal', (function(_this) {
       return function() {
-        _this.modal_shown();
-        return _this.options.onShown.call(_this);
+        _this.modal_show();
+        return _this.options.onShow.call(_this);
       };
-    })(this)).on('hide.bs.modal', this.options.onHide.bind(this)).on('hidden.bs.modal', (function(_this) {
+    })(this)).on('shown.bs.modal', this.options.onShown.bind(this)).on('hide.bs.modal', this.options.onHide.bind(this)).on('hidden.bs.modal', (function(_this) {
       return function() {
         if (_this.gallery) {
           $(document).off('keydown.ekkoLightbox');
@@ -65,7 +65,7 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
   };
 
   EkkoLightbox.prototype = {
-    modal_shown: function() {
+    modal_show: function() {
       var video_id;
       if (!this.options.remote) {
         return this.error('No remote target given');
