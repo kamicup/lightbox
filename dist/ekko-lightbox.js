@@ -47,9 +47,9 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       bottom: parseFloat(this.modal_dialog.css('padding-bottom')) + parseFloat(this.modal_content.css('padding-bottom')) + parseFloat(this.modal_body.css('padding-bottom')),
       left: parseFloat(this.modal_dialog.css('padding-left')) + parseFloat(this.modal_content.css('padding-left')) + parseFloat(this.modal_body.css('padding-left'))
     };
+    this.modal_prepare();
     this.modal.on('show.bs.modal', this.options.onShow.bind(this)).on('shown.bs.modal', (function(_this) {
       return function() {
-        _this.modal_shown();
         return _this.options.onShown.call(_this);
       };
     })(this)).on('hide.bs.modal', this.options.onHide.bind(this)).on('hidden.bs.modal', (function(_this) {
@@ -60,12 +60,12 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
         _this.modal.remove();
         return _this.options.onHidden.call(_this);
       };
-    })(this)).modal('show', options);
+    })(this));
     return this.modal;
   };
 
   EkkoLightbox.prototype = {
-    modal_shown: function() {
+    modal_prepare: function() {
       var video_id;
       if (!this.options.remote) {
         return this.error('No remote target given');
@@ -116,6 +116,10 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
           return this.detectRemoteType(this.options.remote);
         }
       }
+    },
+    content_loaded: function() {
+      this.modal.modal('show', this.options);
+      return this.options.onContentLoaded.call(this);
     },
     strip_stops: function(str) {
       return str.replace(/\./g, '');
@@ -273,7 +277,7 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       this.resize(width);
       height = width + 80;
       this.lightbox_body.html('<iframe width="' + width + '" height="' + height + '" src="' + this.addTrailingSlash(id) + 'embed/" frameborder="0" allowfullscreen></iframe>');
-      this.options.onContentLoaded.call(this);
+      this.content_loaded();
       if (this.modal_arrows) {
         return this.modal_arrows.css('display', 'none');
       }
@@ -282,7 +286,7 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
       height = height || width;
       this.resize(width);
       this.lightbox_body.html('<div class="embed-responsive embed-responsive-16by9"><iframe width="' + width + '" height="' + height + '" src="' + url + '" frameborder="0" allowfullscreen class="embed-responsive-item"></iframe></div>');
-      this.options.onContentLoaded.call(this);
+      this.content_loaded();
       if (this.modal_arrows) {
         this.modal_arrows.css('display', 'none');
       }
@@ -301,7 +305,7 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
         })(this)));
       } else {
         this.lightbox_body.html('<iframe width="' + width + '" height="' + width + '" src="' + url + '" frameborder="0" allowfullscreen></iframe>');
-        this.options.onContentLoaded.call(this);
+        this.content_loaded();
       }
       if (this.modal_arrows) {
         this.modal_arrows.css('display', 'none');
@@ -346,7 +350,7 @@ License: https://github.com/ashleydw/lightbox/blob/master/LICENSE
               } else {
                 _this.resize(img.width);
               }
-              return _this.options.onContentLoaded.call(_this);
+              return _this.content_loaded();
             });
           };
         })(this);

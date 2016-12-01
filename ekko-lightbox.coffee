@@ -51,10 +51,11 @@ EkkoLightbox = ( element, options ) ->
 		left: parseFloat(@modal_dialog.css('padding-left')) + parseFloat(@modal_content.css('padding-left')) + parseFloat(@modal_body.css('padding-left'))
 	}
 
+	@modal_prepare()
+
 	@modal
 	.on('show.bs.modal', @options.onShow.bind(@))
 	.on 'shown.bs.modal', =>
-		@modal_shown()
 		@options.onShown.call(@)
 	.on('hide.bs.modal', @options.onHide.bind(@))
 	.on 'hidden.bs.modal', =>
@@ -62,12 +63,11 @@ EkkoLightbox = ( element, options ) ->
 			$(document).off 'keydown.ekkoLightbox'
 		@modal.remove()
 		@options.onHidden.call(@)
-	.modal 'show', options
 
 	@modal
 
 EkkoLightbox.prototype = {
-	modal_shown: ->
+	modal_prepare: ->
 		# when the modal first loads
 		if !@options.remote
 			@error 'No remote target given'
@@ -112,6 +112,10 @@ EkkoLightbox.prototype = {
 
 			else
 				@detectRemoteType(@options.remote)
+
+	content_loaded: ->
+		@modal.modal 'show', @options
+		@options.onContentLoaded.call(@)
 
 	strip_stops: (str) ->
 		str.replace(/\./g, '')
@@ -240,14 +244,14 @@ EkkoLightbox.prototype = {
 		@resize width
 		height = width + 80
 		@lightbox_body.html '<iframe width="'+width+'" height="'+height+'" src="' + @addTrailingSlash(id) + 'embed/" frameborder="0" allowfullscreen></iframe>'
-		@options.onContentLoaded.call(@)
+		@content_loaded()
 		@modal_arrows.css 'display', 'none' if @modal_arrows #hide the arrows when showing video
 
 	showVideoIframe: (url, width, height) -> # should be used for videos only. for remote content use loadRemoteContent (data-type=url)
 		height = height || width # default to square
 		@resize width
 		@lightbox_body.html '<div class="embed-responsive embed-responsive-16by9"><iframe width="' + width + '" height="' + height + '" src="' + url + '" frameborder="0" allowfullscreen class="embed-responsive-item"></iframe></div>'
-		@options.onContentLoaded.call(@)
+		@content_loaded()
 		@modal_arrows.css 'display', 'none' if @modal_arrows #hide the arrows when showing video
 		@
 
@@ -264,7 +268,7 @@ EkkoLightbox.prototype = {
 
 		else
 			@lightbox_body.html '<iframe width="'+width+'" height="'+width+'" src="' + url + '" frameborder="0" allowfullscreen></iframe>'
-			@options.onContentLoaded.call(@)
+			@content_loaded()
 
 		@modal_arrows.css 'display', 'none' if @modal_arrows #hide the arrows when remote content
 		@
@@ -294,7 +298,7 @@ EkkoLightbox.prototype = {
 						@scaleHeight img.height, img.width
 					else
 						@resize img.width
-					@options.onContentLoaded.call(@)
+					@content_loaded()
 			img.onerror = =>
 				@error 'Failed to load image: ' + src
 
